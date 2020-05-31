@@ -18,7 +18,6 @@ import * as q from './quotes.module.css';
 export default function Discourse({discourseName}) {
   
   const [currentPage, setcurrentPage] = useState()
-  const [src, setsrc] = useState()
   const [displayLists, setdisplayLists] = useState(false)
   const [displayQuotes, setdisplayQuotes] = useState(false)
   const [displayMenu, setdisplayMenu] = useState(true)
@@ -28,27 +27,19 @@ export default function Discourse({discourseName}) {
   const [htmlData, sethtmlData] = useState()
 
   useEffect(() => {
-    if (localStorage.getItem("lastPage") && localStorage.getItem("lastPage") !== undefined) {
-      setcurrentPage(parseInt(localStorage.getItem("lastPage")))
-    } else {
-      setcurrentPage(0)
-    }
-    updateQuotesFromLocalStorage()
-  }, [])
-
-  useEffect(() => {
     axios({
       method: 'get',
-      url: src,
+      url: process.env.PUBLIC_URL + "assets/html_files/html_files/" + discourseName,
       timeout: 4000,
     })
     .then(response => sethtmlData(response.data))
     .then(response => console.log(response.data))
     .catch(error => console.error('timeout exceeded'))
-  }, [src])
+
+    updateQuotesFromLocalStorage()
+  }, [])
 
   useEffect(() => {
-    setsrc(process.env.PUBLIC_URL + "assets/html_files/html_files/" + bookList[currentPage])
     updateBookNamesFromLocalStorage()
     setStarredStatus()
   }, [currentPage])
@@ -138,7 +129,6 @@ export default function Discourse({discourseName}) {
     if (currentPage<bookList.length-1){
       var integer = parseInt(currentPage, 10);
       let newPageNumber = integer + 1
-      localStorage.setItem('lastPage', newPageNumber);
       setcurrentPage(newPageNumber)
     }
   }
@@ -147,7 +137,6 @@ export default function Discourse({discourseName}) {
     if (currentPage>0){
       var integer = parseInt(currentPage, 10);
       let newPageNumber = integer - 1
-      localStorage.setItem('lastPage', newPageNumber);
       setcurrentPage(newPageNumber)
     }
   }
@@ -165,14 +154,12 @@ export default function Discourse({discourseName}) {
 
   const handleClickLink = (index) => {
     setcurrentPage(index)
-    localStorage.setItem('lastPage', index);
     setStarredStatus()
   }
 
   const handleClickLinkFav = (name) => {
     let index = bookList.indexOf(name)
     setcurrentPage(index)
-    localStorage.setItem('lastPage', index);
     setStarredStatus()
   }
 
