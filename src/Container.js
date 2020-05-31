@@ -7,15 +7,14 @@ function Container({ location }) {
   return (
     <div>
       <section className="route-section">
-        <Switch location={location}>
-        <Route exact path = '/'  component={Discourse} />
-        
+        <Route location={location}>
           {bookList.map((discourseTitle)=>{
             return <Route exact path = {'/' + discourseTitle}  
             render={(props) => <Discourse {...props} discourseTitle={discourseTitle} />}
-          />
+            />
           })}
-        </Switch>
+          <Route exact path = '/'  component={Discourse} />
+        </Route>
       </section>
     </div>
   );

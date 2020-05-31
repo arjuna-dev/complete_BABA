@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react";
+import { Link } from 'react-router-dom';
 import TextSelector from 'text-selection-react'
 import bookList from '../assets/bookList'
 import BurgerMenu from './svg/BurgerMenu'
@@ -235,7 +236,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
             <h3 className={lists.listTitle}>All Books</h3>
               <ul>
                   {bookList.map(function(name, index){
-                      return <li key={ index }><button className={lists.listItem} onClick={() => handleClickLink(index)}>{name}</button></li>;
+                      return <li><Link key={ index } to={"/" + name}>{name}</Link></li>;
                     })}
               </ul>
           </div>
