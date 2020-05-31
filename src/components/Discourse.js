@@ -51,7 +51,6 @@ export default function Discourse({discourseName}) {
     setsrc(process.env.PUBLIC_URL + "assets/html_files/html_files/" + bookList[currentPage])
     updateBookNamesFromLocalStorage()
     setStarredStatus()
-    addToHistory()
   }, [currentPage])
 
   const setStarredStatus = () => {
@@ -145,14 +144,11 @@ export default function Discourse({discourseName}) {
   }
 
   const handleClickBack = () => {
-    if (localStorage.getItem('history')) {
-      let history = JSON.parse(localStorage.getItem('history'));
-      if (history.length>0) {
-        let lastPage = history[history.length-2]
-        history.pop()
-        localStorage.setItem('history', JSON.stringify(history));
-        setcurrentPage(lastPage)
-      }
+    if (currentPage>0){
+      var integer = parseInt(currentPage, 10);
+      let newPageNumber = integer - 1
+      localStorage.setItem('lastPage', newPageNumber);
+      setcurrentPage(newPageNumber)
     }
   }
 
@@ -199,19 +195,6 @@ export default function Discourse({discourseName}) {
       localStorage.setItem(`quotes`, JSON.stringify([{quote: text, bookName: bookList[currentPage], date:date}]));
     }
     updateQuotesFromLocalStorage()
-  }
-
-  const addToHistory = () => {
-    if (currentPage!=null) {
-      const history = getFromLocalStorage("history")
-      if (history) {
-        if (history[history.length-1]!=currentPage){
-          localStorage.setItem("history", JSON.stringify([...history, currentPage]));
-        }
-      } else {
-        localStorage.setItem("history", JSON.stringify([currentPage]));
-      }
-    }
   }
 
   return (
