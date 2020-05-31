@@ -15,7 +15,7 @@ import * as menu from './menu.module.css';
 import * as lists from './lists.module.css';
 import * as q from './quotes.module.css';
 
-export default function Discourse({discourseName}) {
+export default function Discourse({discourseTitle="Actions_and_Their_Results_Karma_and_Karmaphala"}) {
   
   const [currentPage, setcurrentPage] = useState()
   const [displayLists, setdisplayLists] = useState(false)
@@ -29,7 +29,7 @@ export default function Discourse({discourseName}) {
   useEffect(() => {
     axios({
       method: 'get',
-      url: process.env.PUBLIC_URL + "assets/html_files/html_files/" + discourseName,
+      url: process.env.PUBLIC_URL + "assets/html_files/html_files/" + discourseTitle + ".html",
       timeout: 4000,
     })
     .then(response => sethtmlData(response.data))
