@@ -1,0 +1,60 @@
+.quotesWrapper{
+    position: fixed;
+    bottom: 10vh;    
+    width: 100vw;
+    height: 70vh;
+    background-color: rgb(255, 255, 255);
+    /* overflow-y: scroll; */
+}
+
+ul {
+    list-style-type: none;
+    padding: 0%;
+}
+
+.quoteTitle{
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0px;
+    left: 0px;
+    background-color: lightgray;
+    margin: 0px;
+    height: 2em;
+    padding-top: 10px;
+    text-align: center;
+}
+
+.deletespan{
+    color: rgb(95, 95, 95);
+    font-style: italic;
+    font-size: 0.7rem;
+    margin: 0 1vw;
+    cursor: pointer;
+}
+
+.notHidden{
+    color: rgb(95, 95, 95);
+    font-style: italic;
+    font-size: 1rem;
+    margin: 0 5vw;
+}
+
+.bookQuotesDiv{
+    height: 70vh;
+    background-color: lightgray;
+    overflow-y: scroll;
+}
+
+.bookQuotesDiv li{
+    margin: 20px 15vw;
+    border: 1px solid gray;
+    border-radius: 10px;
+    text-align: center;
+    padding: 10px;
+    overflow-wrap: break-word;
+    /* text-decoration: underline; */
+}
+
+.isHidden{
+    display: none;
+}

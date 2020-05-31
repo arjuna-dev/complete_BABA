@@ -1,0 +1,15 @@
+.theDiscourse {
+    background-color: rgb(255, 255, 255);
+    color: rgb(22, 22, 22);
+    font-size:1rem;
+    padding: 10vh;
+    overflow-wrap: break-word;
+}
+
+@media only screen and (max-width: 600px) {
+    .theDiscourse {
+        color: rgb(22, 22, 22);
+        font-size: 1.3rem;
+        padding: 5vh;
+    }
+  }

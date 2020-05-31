@@ -1,0 +1,49 @@
+.listWrapper{
+    position: fixed;
+    bottom: 10vh;    
+    width: 100vw;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0%;
+}
+
+.listTitle{
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0px;
+    left: 0px;
+    background-color: lightgray;
+    margin: 0px;
+    height: 2em;
+    padding-top: 10px;
+    text-align: center;
+}
+
+.listItem{
+    padding: 0%;
+    margin: 0%;
+    text-decoration: underline;
+    color: #0000EE;
+}
+
+.lists{
+    display: flex;
+    background-color: lightgray;
+    height: 70vh;
+}
+
+.bookListDiv{
+    width: 50%;
+    overflow-y: scroll;
+}
+
+.bookListDiv li{
+    margin: 0px 0px 5px 10px;
+    text-decoration: underline;
+}
+
+.isHidden{
+    display: none;
+}
