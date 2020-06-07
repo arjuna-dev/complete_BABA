@@ -4,6 +4,40 @@
     width: 100vw;
 }
 
+.bookListDiv > button {
+    border: 1px solid gray;
+    font-size: 1em;
+    border-radius: 10px;
+    text-decoration: none;
+    background-color: lightgray;
+    padding: 0.2em 0.5em;
+    margin: 1vw 1vw 0vw 1vw;
+  }
+
+  .tagsWrapper{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    position: fixed;
+    background-color:rgb(240, 240, 240);;
+    bottom: 10vh;    
+    width: 100vw;
+}
+
+.tagsWrapper > button {
+    border: 1px solid gray;
+    font-size: 1em;
+    border-radius: 10px;
+    text-decoration: none;
+    background-color: lightgray;
+    padding: 0.2em 0.5em;
+    margin: 1vw 1vw 1vw 1vw;
+  }
+
+
+
 ul {
     list-style-type: none;
     padding: 0%;
@@ -35,6 +69,8 @@ ul {
 }
 
 .bookListDiv{
+    display: flex;
+    flex-direction: column;
     width: 50%;
     overflow-y: scroll;
 }

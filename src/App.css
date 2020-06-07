@@ -10,3 +10,7 @@
 .discourse_box table{
   display: none;
 }
+
+button:focus {
+  outline:none;
+}

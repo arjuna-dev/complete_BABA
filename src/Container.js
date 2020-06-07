@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, withRouter, Switch } from 'react-router-dom';
+import { Route, withRouter } from 'react-router-dom';
 import Discourse from './components/Discourse'
 import bookList from './assets/bookList'
 
