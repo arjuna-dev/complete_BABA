@@ -1,6 +1,6 @@
 .listWrapper{
     position: fixed;
-    bottom: 10vh;    
+    bottom: 18vh;    
     width: 100vw;
 }
 
@@ -11,8 +11,14 @@
     text-decoration: none;
     background-color: lightgray;
     padding: 0.2em 0.5em;
-    margin: 1vw 1vw 0vw 1vw;
+    margin: 0.3vw 1vw 0vw 1vw;
   }
+
+@media only screen and (max-width: 600px) {
+    .bookListDiv > button {
+        margin: 1vw 1vw 0vw 1vw;
+  }
+}
 
   .tagsWrapper{
     display: flex;
@@ -21,7 +27,7 @@
     align-items: center;
     justify-content: flex-start;
     position: fixed;
-    background-color:rgb(240, 240, 240);;
+    background-color:rgb(240, 240, 240);
     bottom: 10vh;    
     width: 100vw;
 }
@@ -33,9 +39,8 @@
     text-decoration: none;
     background-color: lightgray;
     padding: 0.2em 0.5em;
-    margin: 1vw 1vw 1vw 1vw;
+    margin: 1vw;
   }
-
 
 
 ul {
@@ -64,8 +69,10 @@ ul {
 
 .lists{
     display: flex;
-    background-color: lightgray;
-    height: 70vh;
+    background-color: rgba(29, 29, 29, 0.829);
+    background-color: rgba(211, 211, 211, 0.63);
+    backdrop-filter: blur(3px);
+    height: 55vh;
 }
 
 .bookListDiv{

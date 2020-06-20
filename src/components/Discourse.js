@@ -2,14 +2,12 @@ import React, {useState, useEffect} from "react";
 import { Link } from 'react-router-dom';
 import TextSelector from 'text-selection-react'
 import allDscrsList from '../assets/bookList'
-import BurgerMenu from './svg/BurgerMenu'
 import ArrowDown from './svg/ArrowDown'
 import ArrowBack from './svg/ArrowBack'
 import ArrowNext from './svg/ArrowNext'
 import ArrowUp from './svg/ArrowUp'
 import axios from 'axios';
 import Star from './svg/Star'
-import StarSelected from './svg/StarSelected'
 import * as discourse from './discourse.module.css';
 import * as menu from './menu.module.css';
 import * as lists from './lists.module.css';
@@ -18,6 +16,7 @@ import * as q from './quotes.module.css';
 export default function Discourse({discourseTitle="Actions_and_Their_Results_Karma_and_Karmaphala"}) {
   
   const [currentDiscourse, setcurrentDiscourse] = useState()
+  const [currentIndex, setcurrentIndex] = useState()
   
 
   const [favDscrsList, setfavDscrsList] = useState([])
@@ -27,6 +26,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
   const [jinaniDscrsList, setjinaniDscrsList] = useState([])
   const [badDscrsList, setbadDscrsList] = useState([])
   const [readDscrsList, setreadDscrsList] = useState([])
+  const [proutDscrsList, setproutDscrsList] = useState([])
 
   const [displayLists, setdisplayLists] = useState(false)
   const [displayQuotes, setdisplayQuotes] = useState(false)
@@ -45,6 +45,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
   const [isJinani, setisJinani] = useState()
   const [isBad, setisBad] = useState()
   const [isRead, setisRead] = useState()
+  const [isProut, setisProut] = useState()
 
   const [currentList, setcurrentList] = useState(allDscrsList)
   const [currentListTitle, setcurrentListTitle] = useState("All Discourses")
@@ -55,12 +56,17 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
       url: process.env.PUBLIC_URL + "assets/html_files/html_files/" + discourseTitle + ".html",
       timeout: 4000,
     })
-    .then(response => sethtmlData(response.data))
+    .then((response) => {
+      sethtmlData(response.data)
+      console.log(response.data)
+    })
     .catch(error => console.error('timeout exceeded'))
+
 
     let nextIndex = allDscrsList.indexOf(window.location.pathname.substr(1)) + 1
     let prevIndex = allDscrsList.indexOf(window.location.pathname.substr(1)) - 1
 
+    setcurrentIndex(allDscrsList.indexOf(window.location.pathname.substr(1)))
     setcurrentDiscourse(window.location.pathname.substr(1))
     setnextDiscourse(allDscrsList[nextIndex])
     setprevDiscourse(allDscrsList[prevIndex])
@@ -71,6 +77,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
     updateListFromLocalStorage("jinaniDscrsList", setjinaniDscrsList)
     updateListFromLocalStorage("badDscrsList", setbadDscrsList)
     updateListFromLocalStorage("readDscrsList", setreadDscrsList)
+    updateListFromLocalStorage("proutDscrsList", setproutDscrsList)
     updateListFromLocalStorage("favDscrsList", setfavDscrsList)
   }, [])
 
@@ -82,6 +89,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
     updateIsInList("jinaniDscrsList", setisJinani)
     updateIsInList("badDscrsList", setisBad)
     updateIsInList("readDscrsList", setisRead)
+    updateIsInList("proutDscrsList", setisProut)
   }, [currentDiscourse])
 
   const getFromLocalStorage = (key) => {
@@ -93,7 +101,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
     let date = new Date().toISOString()
     if (localStorage.getItem(key)){
       const starredItems = getFromLocalStorage(key)
-      localStorage.setItem(key, JSON.stringify([...starredItems, {bookName: currentDiscourse, date:date}]));
+      localStorage.setItem(key, JSON.stringify([...starredItems, {bookName: currentDiscourse, date:date, bookNumner: currentIndex + 1}]));
     } else {
       localStorage.setItem(key, JSON.stringify([{bookName: currentDiscourse, date:date}]));
     }
@@ -159,6 +167,9 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
     updateListAndTitle(revDscrsList, "Revolutionary")
   }, [revDscrsList])
   useEffect (() => {
+    updateListAndTitle(proutDscrsList, "PROUT")
+  }, [proutDscrsList])
+  useEffect (() => {
     updateListAndTitle(jinaniDscrsList, "Jinani")
   }, [jinaniDscrsList])
   useEffect (() => {
@@ -183,7 +194,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
       const parsedQuotes = JSON.parse(localStorage.getItem('quotes'))
       setquotes([])
       for (let i=0; i<parsedQuotes.length; i++) {
-        setquotes(quotes => [...quotes, parsedQuotes[i].quote])
+        setquotes(quotes => [...quotes, parsedQuotes[i]])
       }
     }
   }
@@ -191,6 +202,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
   const handleClickQuotes = () => {
     setdisplayQuotes(!displayQuotes)
     setdisplayLists(false)
+    setdisplayTags(false)
   }
 
   const handleClickHide = () => {
@@ -200,9 +212,11 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
     setdisplayQuotes(false)
   }
 
-  const handleClickLists = () => {
+  const handleClickTags = () => {
+    setdisplayTags(!displayTags)
     setdisplayLists(!displayLists)
     setdisplayQuotes(false)
+    setdisplayLists(false)
   }
 
   const handleClickUp = () => {
@@ -214,9 +228,9 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
     let date = new Date().toISOString()
     if (localStorage.getItem("quotes")){
       const quotes = getFromLocalStorage("quotes")
-      localStorage.setItem('quotes', JSON.stringify([...quotes, {quote: text, bookName: currentDiscourse, date:date}]));
+      localStorage.setItem('quotes', JSON.stringify([...quotes, {quote: text, bookName: currentDiscourse, date:date, bookNumber: currentIndex+1}]));
     } else {
-      localStorage.setItem(`quotes`, JSON.stringify([{quote: text, bookName: currentDiscourse, date:date}]));
+      localStorage.setItem(`quotes`, JSON.stringify([{quote: text, bookName: currentDiscourse, date:date, bookNumber: currentIndex+1}]));
     }
     updateQuotesFromLocalStorage()
   }
@@ -241,7 +255,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
 
   return (
     <div>
-
+      <p style={{float: 'right', margin: '0.5rem'}}>{currentIndex+1}/{allDscrsList.length}</p>
       <TextSelector
               events={[
               {
@@ -249,7 +263,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
                   handler: handleSelectText
               }
               ]}
-              color={'#FDFF8C'}
+              color={'lightgray'}
               colorText={true}
           />
 
@@ -261,9 +275,10 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
           <h3 className={q.quoteTitle}>Quotes</h3>
           <p className={quotes.length>0?q.isHidden:q.notHidden}>Select text in a desktop computer to add it to your quotes</p>
           <ul>
-              {quotes.map(function(name, index){
-                  return <li key={ name }>
-                          <p className={q.listItem}>{name}<span className={q.deletespan} onClick={() => handleClickDeleteQuote(name)}>delete</span></p>  
+              {quotes.map(function(quote, index){
+                  return <li key={ index }>
+                          <p className={q.listItem}>{quote.quote}<span className={q.deletespan} onClick={() => handleClickDeleteQuote(quote.quote)}>delete</span></p>  
+                          <h6 className={q.sub}>{quote.bookName} {quote.bookNumber}/{allDscrsList.length}</h6>
                         </li>;
                 })}
           </ul>
@@ -272,7 +287,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
 
       {/* lists */}
       <div className={lists.listWrapper}>
-        <div className={displayLists?lists.lists:lists.isHidden}>
+        <div className={displayTags?lists.lists:lists.isHidden}>
           <div className={lists.bookListDiv}>
           <h3 className={lists.listTitle}>Lists</h3>
             <button onClick={() => updateListAndTitle(allDscrsList, "All Discourses")}>All Discourses</button>
@@ -283,6 +298,7 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
             <button onClick={() => updateListAndTitle(jinaniDscrsList, "Jinani")}>Jinani</button>
             <button onClick={() => updateListAndTitle(badDscrsList, "Didn't Like")}>Didn't Like</button>
             <button onClick={() => updateListAndTitle(readDscrsList, "Read")}>Read</button>
+            <button onClick={() => updateListAndTitle(proutDscrsList, "PROUT")}>PROUT</button>
           </div>
           <div className={lists.bookListDiv}>
             {listRenderer(currentList, currentListTitle)}
@@ -297,40 +313,37 @@ export default function Discourse({discourseTitle="Actions_and_Their_Results_Kar
         <div className={menu.menuContainer}>
           <div>
             <button className={menu.menuButton} ><Link to={"/" + prevDiscourse}><ArrowBack /></Link></button>
-            <h6 className={menu.menuTitles}>prev</h6>
+            <h6 className={menu.menuTitles}>Prev</h6>
           </div>
           <div>
             <button className={menu.quotesButton} onClick={handleClickQuotes}>Q</button>
-            <h6 className={menu.menuTitles}>quotes</h6>
-          </div>
-          <div>
-            <button className={menu.menuButton} onClick={handleClickLists}><BurgerMenu></BurgerMenu></button>
-            <h6 className={menu.menuTitles}>lists</h6>
+            <h6 className={menu.menuTitles}>Quotes</h6>
           </div>
           <div>
             <button className={menu.menuButton} onClick={handleClickHide}><ArrowDown></ArrowDown></button>
-            <h6 className={menu.menuTitles}>hide</h6>
+            <h6 className={menu.menuTitles}>Hide</h6>
           </div>
           <div>
-            <button className={menu.menuButton} onClick={() => setdisplayTags(!displayTags)}>{<Star/>}</button>
-            <h6 className={menu.menuTitles}>tags</h6>
+            <button className={menu.menuButton} onClick={handleClickTags}>{<Star/>}</button>
+            <h6 className={menu.menuTitles}>Tags</h6>
           </div>
           <div>
             <button className={menu.menuButton}><Link to={"/" + nextDiscourse}><ArrowNext /></Link></button>
-            <h6 className={menu.menuTitles}>next</h6>
+            <h6 className={menu.menuTitles}>Next</h6>
           </div>
         </div>
       </div>
 
       {/* Tags */}
       <div className={displayTags?lists.tagsWrapper:lists.isHidden}>
-        <button onClick={() => toggleInList(isFav, "favDscrsList", setfavDscrsList, setisFav)}>Favorite</button>
-        <button onClick={() => toggleInList(isDevotional, "devotionalDscrsList", setdevotionalDscrsList, setisDevotional)}>Devotional</button>
-        <button onClick={() => toggleInList(isBad, "badDscrsList", setbadDscrsList, setisBad)}>Didn't Like</button>
-        <button onClick={() => toggleInList(isFunny, "funnyDscrsList", setfunnyDscrsList, setisFunny)}>Funny</button>
-        <button onClick={() => toggleInList(isJinani, "jinaniDscrsList", setjinaniDscrsList, setisJinani)}>Jinani</button>
-        <button onClick={() => toggleInList(isRead, "readDscrsList", setreadDscrsList, setisRead)}>Already Read</button>
-        <button onClick={() => toggleInList(isRev, "revDscrsList", setrevDscrsList, setisRev)}>Revolutionary</button>
+        <button style={isFav?{backgroundColor: "orange", borderColor: "darkorange"}:null} onClick={() => toggleInList(isFav, "favDscrsList", setfavDscrsList, setisFav)}>Favorite</button>
+        <button style={isDevotional?{backgroundColor: "orange", borderColor: "darkorange"}:null} onClick={() => toggleInList(isDevotional, "devotionalDscrsList", setdevotionalDscrsList, setisDevotional)}>Devotional</button>
+        <button style={isBad?{backgroundColor: "orange", borderColor: "darkorange"}:null} onClick={() => toggleInList(isBad, "badDscrsList", setbadDscrsList, setisBad)}>Didn't Like</button>
+        <button style={isFunny?{backgroundColor: "orange", borderColor: "darkorange"}:null} onClick={() => toggleInList(isFunny, "funnyDscrsList", setfunnyDscrsList, setisFunny)}>Funny</button>
+        <button style={isJinani?{backgroundColor: "orange", borderColor: "darkorange"}:null} onClick={() => toggleInList(isJinani, "jinaniDscrsList", setjinaniDscrsList, setisJinani)}>Jinani</button>
+        <button style={isRead?{backgroundColor: "orange", borderColor: "darkorange"}:null} onClick={() => toggleInList(isRead, "readDscrsList", setreadDscrsList, setisRead)}>Read</button>
+        <button style={isRev?{backgroundColor: "orange", borderColor: "darkorange"}:null} onClick={() => toggleInList(isRev, "revDscrsList", setrevDscrsList, setisRev)}>Revolutionary</button>
+        <button style={isProut?{backgroundColor: "orange", borderColor: "darkorange"}:null} onClick={() => toggleInList(isProut, "proutDscrsList", setproutDscrsList, setisProut)}>PROUT</button>
       </div>
     </div>
   )

@@ -58,3 +58,8 @@ ul {
 .isHidden{
     display: none;
 }
+
+.sub{
+    font-weight: 300;
+    font-style: italic;
+}
