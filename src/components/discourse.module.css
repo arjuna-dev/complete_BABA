@@ -6,10 +6,26 @@
     overflow-wrap: break-word;
 }
 
+.randomDiscourseButtonWrapper {
+    position: fixed;
+    right: 18px;
+    bottom: 94px;
+    z-index: 5;
+}
+
+.randomDiscourseButton {
+    font-size: 1.2rem;
+    padding: 0.3rem 0.6rem;
+}
+
 @media only screen and (max-width: 600px) {
     .theDiscourse {
         color: rgb(22, 22, 22);
         font-size: 1.3rem;
         padding: 5vh;
+    }
+
+    .randomDiscourseButtonWrapper {
+        bottom: 104px;
     }
   }

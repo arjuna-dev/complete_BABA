@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useMemo, useRef} from "react";
 import TextSelector from 'text-selection-react'
 import bookList from '../assets/bookList'
 import BurgerMenu from './svg/BurgerMenu'
@@ -26,6 +26,31 @@ export default function Discourse({discourseName}) {
   const [quotes, setquotes] = useState([])
   const [isStarred, setisStarred] = useState()
   const [htmlData, sethtmlData] = useState()
+  const [isRandomChainActive, setIsRandomChainActive] = useState(false)
+  const [isCurrentPageRandomTriggered, setIsCurrentPageRandomTriggered] = useState(false)
+  const [randomFilterIndices, setRandomFilterIndices] = useState(null)
+  const pendingNavigationSource = useRef("normal")
+
+  const defaultRandomFilterIndices = useMemo(() => {
+    if (!discourseName) {
+      return bookList.map((_, index) => index)
+    }
+    if (Array.isArray(discourseName)) {
+      const validIndices = discourseName
+        .map(name => bookList.indexOf(name))
+        .filter(index => index !== -1)
+      return validIndices.length > 0 ? validIndices : bookList.map((_, index) => index)
+    }
+    if (typeof discourseName === "string") {
+      const lowerFilter = discourseName.toLowerCase()
+      const filteredIndices = bookList
+        .map((name, index) => ({name, index}))
+        .filter(item => item.name.toLowerCase().includes(lowerFilter))
+        .map(item => item.index)
+      return filteredIndices.length > 0 ? filteredIndices : bookList.map((_, index) => index)
+    }
+    return bookList.map((_, index) => index)
+  }, [discourseName])
 
   useEffect(() => {
     if (localStorage.getItem("lastPage") && localStorage.getItem("lastPage") !== undefined) {
@@ -139,8 +164,7 @@ export default function Discourse({discourseName}) {
     if (currentPage<bookList.length-1){
       var integer = parseInt(currentPage, 10);
       let newPageNumber = integer + 1
-      localStorage.setItem('lastPage', newPageNumber);
-      setcurrentPage(newPageNumber)
+      navigateToPage(newPageNumber, "normal")
     }
   }
 
@@ -151,7 +175,7 @@ export default function Discourse({discourseName}) {
         let lastPage = history[history.length-2]
         history.pop()
         localStorage.setItem('history', JSON.stringify(history));
-        setcurrentPage(lastPage)
+        navigateToPage(lastPage, "normal")
       }
     }
   }
@@ -168,15 +192,13 @@ export default function Discourse({discourseName}) {
   }
 
   const handleClickLink = (index) => {
-    setcurrentPage(index)
-    localStorage.setItem('lastPage', index);
+    navigateToPage(index, "normal")
     setStarredStatus()
   }
 
   const handleClickLinkFav = (name) => {
     let index = bookList.indexOf(name)
-    setcurrentPage(index)
-    localStorage.setItem('lastPage', index);
+    navigateToPage(index, "normal")
     setStarredStatus()
   }
 
@@ -214,6 +236,48 @@ export default function Discourse({discourseName}) {
     }
   }
 
+  const navigateToPage = (index, source = "normal") => {
+    pendingNavigationSource.current = source
+    localStorage.setItem('lastPage', index)
+    setcurrentPage(index)
+  }
+
+  const getRandomIndexFromFilter = (filterIndices) => {
+    if (!filterIndices || filterIndices.length === 0) {
+      return null
+    }
+    if (filterIndices.length === 1) {
+      return filterIndices[0]
+    }
+    const choices = filterIndices.filter(index => index !== currentPage)
+    const pool = choices.length > 0 ? choices : filterIndices
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+
+  const handleClickRandomDiscourse = () => {
+    const activeFilter = randomFilterIndices && randomFilterIndices.length > 0
+      ? randomFilterIndices
+      : defaultRandomFilterIndices
+    const randomIndex = getRandomIndexFromFilter(activeFilter)
+    if (randomIndex == null) {
+      return
+    }
+    setRandomFilterIndices(activeFilter)
+    setIsRandomChainActive(true)
+    navigateToPage(randomIndex, "random")
+  }
+
+  useEffect(() => {
+    if (pendingNavigationSource.current === "random") {
+      setIsCurrentPageRandomTriggered(true)
+    } else {
+      setIsCurrentPageRandomTriggered(false)
+      setIsRandomChainActive(false)
+      setRandomFilterIndices(null)
+    }
+    pendingNavigationSource.current = "normal"
+  }, [currentPage])
+
   return (
     <div>
 
@@ -233,6 +297,13 @@ export default function Discourse({discourseName}) {
       </div>
 
       <div className={discourse.theDiscourse} dangerouslySetInnerHTML={{__html: htmlData}}></div>
+      {isRandomChainActive && isCurrentPageRandomTriggered && (
+        <div className={discourse.randomDiscourseButtonWrapper}>
+          <button className={discourse.randomDiscourseButton} onClick={handleClickRandomDiscourse}>
+            <span role="img" aria-label="random discourse">🎲</span>
+          </button>
+        </div>
+      )}
 
       {/* quotes */}
       <div className={displayQuotes?q.quotesWrapper:q.isHidden}>
@@ -300,6 +371,12 @@ export default function Discourse({discourseName}) {
           <div>
             <button className={menu.nextButton} onClick={handleClickNext}><ArrowNext></ArrowNext></button>
             <h6 className={menu.menuTitles}>next</h6>
+          </div>
+          <div>
+            <button className={menu.randomButton} onClick={handleClickRandomDiscourse}>
+              <span role="img" aria-label="random discourse">🎲</span>
+            </button>
+            <h6 className={menu.menuTitles}>random</h6>
           </div>
         </div>
       </div>
